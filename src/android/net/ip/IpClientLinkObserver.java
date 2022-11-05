@@ -39,6 +39,7 @@ import android.net.LinkProperties;
 import android.net.RouteInfo;
 import android.net.util.SharedLog;
 import android.os.Handler;
+import android.os.SystemProperties;
 import android.system.OsConstants;
 import android.util.Log;
 
@@ -103,6 +104,8 @@ import java.util.concurrent.TimeUnit;
  */
 public class IpClientLinkObserver implements NetworkObserver {
     private final String mTag;
+    private static final boolean USE_EBPF = SystemProperties.getBoolean("ro.kernel.ebpf.supported", true);
+
 
     /**
      * Callback used by {@link IpClientLinkObserver} to send update notifications.
@@ -216,7 +219,7 @@ public class IpClientLinkObserver implements NetworkObserver {
 
     private boolean isNetlinkEventParsingEnabled() {
         return mDependencies.isFeatureEnabled(mContext, IPCLIENT_PARSE_NETLINK_EVENTS_VERSION,
-                isAtLeastT() /* default value */);
+                isAtLeastT() && USE_EBPF /* default value */);
     }
 
     private int getSocketReceiveBufferSize() {
